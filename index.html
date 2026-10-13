@@ -35,7 +35,7 @@
         /* 調整最大寬度以適應平板與電腦 */
         .container {
             width: 100%;
-            max-width: 768px; /* 從 540px 放寬為 768px */
+            max-width: 768px;
             margin-top: 10px;
             transition: all 0.3s ease;
         }
@@ -356,64 +356,19 @@
         }
 
         /* ========== RWD 響應式設定 ========== */
-        /* 平板與電腦裝置 (大於 768px) */
         @media (min-width: 768px) {
-            .container {
-                margin-top: 40px;
-            }
-            
-            header {
-                padding: 40px 20px;
-                border-radius: 20px;
-            }
-
-            h1 {
-                font-size: 32px;
-            }
-
-            .subtitle {
-                font-size: 16px;
-            }
-
-            .search-box {
-                padding: 40px;
-                border-radius: 24px;
-            }
-
-            .input-group i {
-                font-size: 20px;
-                left: 20px;
-            }
-
-            input[type="text"] {
-                font-size: 18px;
-                padding: 20px 20px 20px 55px;
-            }
-
-            button {
-                font-size: 18px;
-                padding: 18px;
-            }
-
-            /* 平板與電腦上，下方連結改為並排顯示 */
-            .form-link-container {
-                flex-direction: row;
-                gap: 20px;
-            }
-
-            .form-link {
-                font-size: 15px;
-                padding: 16px;
-            }
-
-            .address-text {
-                font-size: 20px;
-            }
-            
-            .badge {
-                font-size: 14.5px;
-                padding: 8px 14px;
-            }
+            .container { margin-top: 40px; }
+            header { padding: 40px 20px; border-radius: 20px; }
+            h1 { font-size: 32px; }
+            .subtitle { font-size: 16px; }
+            .search-box { padding: 40px; border-radius: 24px; }
+            .input-group i { font-size: 20px; left: 20px; }
+            input[type="text"] { font-size: 18px; padding: 20px 20px 20px 55px; }
+            button { font-size: 18px; padding: 18px; }
+            .form-link-container { flex-direction: row; gap: 20px; }
+            .form-link { font-size: 15px; padding: 16px; }
+            .address-text { font-size: 20px; }
+            .badge { font-size: 14.5px; padding: 8px 14px; }
         }
     </style>
 </head>
@@ -444,16 +399,14 @@
             
             <!-- 填報說明與表單連結 -->
             <div class="form-link-container">
-                <!-- 填報說明連結 -->
                 <a href="https://docs.google.com/presentation/d/1vMftZNVAayvOPu_-dMs7QdB0KH5w0QieblvfCqhhhQc/edit?slide=id.p#slide=id.p" target="_blank" class="form-link doc-link">
                     <i class="fa-solid fa-book-open" style="font-size: 16px;"></i>
-                    <span>住宅火警住警器<br>示警成效統計表填報說明 ↗</span>
+                    <span>住宅火警住警器安裝情況填報說明 ↗</span>
                 </a>
                 
-                <!-- 統計表連結 -->
                 <a href="https://docs.google.com/forms/d/e/1FAIpQLScygm2kEI7JaOvLoMqSjzZESo1ud2wYJyPrMtSueQbiQdslhQ/viewform" target="_blank" class="form-link">
                     <i class="fa-solid fa-file-signature" style="font-size: 16px;"></i>
-                    <span>住宅火警住警器<br>示警成效統計表 ↗</span>
+                    <span>臺中市政府消防局<br>住宅火警住警器示警成效統計表 ↗</span>
                 </a>
             </div>
         </div>
@@ -462,7 +415,7 @@
     </div>
 
     <script>
-        // 設定 Google Sheet ID 与 URL
+        // 設定 Google Sheet ID 與 URL
         const sheetId = '1Zyb0j_uR4DyhvRYuYsA1i3Xn0_ckJ19fdabQweYPm64';
         const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
         
@@ -575,8 +528,9 @@
                             <span class="badge badge-year">
                                 <i class="fa-regular fa-calendar"></i> 安裝年度：${row['安裝年度'] || '無資料'}
                             </span>
+                            <!-- 這裡將顯示與讀取的欄位都修改為設置來源 -->
                             <span class="badge badge-method">
-                                <i class="fa-solid fa-hand-holding-hand"></i> 補助方式：${row['設置來源'] || '無資料'}
+                                <i class="fa-solid fa-hand-holding-hand"></i> 設置來源：${row['設置來源'] || '無資料'}
                             </span>
                             <span class="badge badge-location">
                                 <i class="fa-solid fa-map-location-dot"></i> 里別：${row['里別'] || '無資料'}
