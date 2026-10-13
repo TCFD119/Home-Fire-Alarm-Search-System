@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>臺中市住警器安裝查詢系統 (中山分隊)</title>
+    <!-- 引入 Font Awesome 繽紛圖示 與 PapaParse -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #e53935;
+            --primary-dark: #b71c1c;
+            --bg-dark: #1e1e24;
+            --card-bg: #ffffff;
+            --text-dark: #2c3e50;
+            --text-light: #f5f6fa;
+            --accent-green: #2e7d32;
+            --accent-orange: #ef6c00;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #121214 0%, #232526 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 540px;
+            margin-top: 10px;
+        }
+
+        /* 頂部消防專屬 Header */
+        header {
+            text-align: center;
+            background: linear-gradient(180deg, rgba(229, 57, 53, 0.15) 0%, rgba(183, 28, 28, 0) 100%);
+            padding: 25px 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(229, 57, 53, 0.2);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at top, rgba(229, 57, 53, 0.2) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .logo-area {
+            font-size: 42px;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 4px 8px rgba(229, 57, 53, 0.4));
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 5px 0;
+            color: #ffeb3b;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 235, 59, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #cfd8dc;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+
+        /* 搜尋區塊卡片 */
+        .search-box {
+            background: rgba(33, 33, 33, 0.95);
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .status-msg {
+            text-align: center;
+            font-size: 13.5px;
+            color: #81c784;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 8px 12px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid rgba(76, 175, 80, 0.15);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #78909c;
+            font-size: 18px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            border: 2.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 15px rgba(229, 57, 53, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(229, 57, 53, 0.6);
+            background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #424242;
+            color: #757575;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* 連結按鈕 (示警成效統計表) */
+        .form-link-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #90caf9;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px dashed rgba(144, 202, 249, 0.3);
+            transition: all 0.25s ease;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .form-link:hover {
+            background: rgba(144, 202, 249, 0.08);
+            border-color: #90caf9;
+            color: #ffffff;
+            transform: scale(1.01);
+        }
+
+        /* 搜尋結果呈現 */
+        .result-title {
+            font-size: 14px;
+            color: #b0bec5;
+            margin: 15px 5px 8px 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-card {
+            background: #ffffff;
+            color: var(--text-dark);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            margin-bottom: 15px;
+            border-left: 6px solid var(--accent-green);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card.status-alert {
+            background: rgba(33, 150, 243, 0.12);
+            border-left: 6px solid #2196f3;
+            color: #e3f2fd;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .result-card.error {
+            border-left-color: #d32f2f;
+            background: #fff;
+        }
+        
+        .result-card.error h3 {
+            color: #d32f2f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 10px 0;
+        }
+
+        .result-card.warning {
+            border-left-color: var(--accent-orange);
+            background: #fff3e0;
+            color: #e65100;
+            padding: 15px;
+            font-size: 13.5px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .result-card h3 {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            font-weight: 800;
+            color: #1a237e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .address-text {
+            font-size: 17px;
+            font-weight: 700;
+            color: #111111;
+            margin: 0 0 15px 0;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .address-text i {
+            color: var(--primary-color);
+            margin-top: 3px;
+        }
+
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .badge {
+            background: #f1f3f4;
+            color: #3c4043;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .badge-year {
+            background: rgba(229, 57, 53, 0.08);
+            color: var(--primary-dark);
+            border-color: rgba(229, 57, 53, 0.15);
+        }
+
+        .badge-method {
+            background: rgba(76, 175, 80, 0.08);
+            color: var(--accent-green);
+            border-color: rgba(76, 175, 80, 0.15);
+        }
+
+        .badge-location {
+            background: rgba(33, 150, 243, 0.08);
+            color: #1565c0;
+            border-color: rgba(33, 150, 243, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 消防局 Header -->
+        <header>
+            <div class="logo-area">🚒</div>
+            <h1>住警器安裝查詢系統</h1>
+            <div class="subtitle">臺中市政府消防局第三大隊 (中山分隊專用)</div>
+        </header>
+
+        <!-- 搜尋卡片 -->
+        <div class="search-box">
+            <div id="loading-status" class="status-msg">
+                <i class="fa-solid fa-spinner fa-spin"></i> 資料載入中，請稍候...
+            </div>
+            
+            <div class="input-group">
+                <i class="fa-solid fa-location-dot"></i>
+                <input type="text" id="addressInput" placeholder="請輸入地址 (例如: 新平路三段...)" disabled autocomplete="off">
+            </div>
+            
+            <button id="searchBtn" onclick="searchAddress()" disabled>
+                <i class="fa-solid fa-magnifying-glass"></i> 開始查詢
+            </button>
+            
+            <!-- 示警成效統計表連結 -->
+            <div class="form-link-container">
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLScygm2kEI7JaOvLoMqSjzZESo1ud2wYJyPrMtSueQbiQdslhQ/viewform" target="_blank" class="form-link">
+                    <i class="fa-solid fa-file-signature" style="font-size: 16px;"></i>
+                    <span>臺中市政府消防局<br>住宅火警住警器示警成效統計表 ↗</span>
+                </a>
+            </div>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // 設定 Google Sheet ID 与 URL
+        const sheetId = '1Zyb0j_uR4DyhvRYuYsA1i3Xn0_ckJ19fdabQweYPm64';
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
+        
+        let alarmData = [];
+
+        // 自動載入試算表
+        window.onload = function() {
+            Papa.parse(csvUrl, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    alarmData = results.data;
+                    const statusEl = document.getElementById('loading-status');
+                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> 資料載入完成 (共 ${alarmData.length} 筆)`;
+                    statusEl.style.color = "#a5d6a7";
+                    statusEl.style.background = "rgba(76, 175, 80, 0.15)";
+                    
+                    document.getElementById('addressInput').disabled = false;
+                    document.getElementById('searchBtn').disabled = false;
+                },
+                error: function(error) {
+                    const statusEl = document.getElementById('loading-status');
+                    statusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> 資料載入失敗，請檢查網路或權限。`;
+                    statusEl.style.color = "#ff8a80";
+                    statusEl.style.background = "rgba(244, 67, 54, 0.15)";
+                    statusEl.style.borderColor = "rgba(244, 67, 54, 0.3)";
+                }
+            });
+        };
+
+        // 地址防呆與規格化
+        function normalizeAddress(addrStr) {
+            if (!addrStr) return "";
+            let res = addrStr.replace(/台中市|臺中市|太平區|區/g, '');
+            res = res.replace(/[\uff10-\uff19]/g, function(ch) {
+                return String.fromCharCode(ch.charCodeAt(0) - 0xfee0);
+            });
+            res = res.replace(/[-~]/g, '之');
+            
+            res = res.replace(/二十([一二三四五六七八九])/g, '二$1');
+            res = res.replace(/三十([一二三四五六七八九])/g, '三$1');
+            res = res.replace(/十([一二三四五六七八九])/g, '一$1');
+            res = res.replace(/二十街/g, '二零街');
+            res = res.replace(/三十街/g, '三零街');
+            res = res.replace(/十街/g, '一零街');
+
+            const numMap = {
+                '1':'一', '2':'二', '3':'三', '4':'四', '5':'五',
+                '6':'六', '7':'七', '8':'八', '9':'九', '0':'零'
+            };
+            
+            res = res.replace(/(\d+)(街|路|段)/g, function(match, nums, type) {
+                let chineseNums = nums.split('').map(n => numMap[n]).join('');
+                return chineseNums + type;
+            });
+            
+            return res.trim();
+        }
+
+        // 搜尋地址邏輯
+        function searchAddress() {
+            const inputVal = document.getElementById('addressInput').value;
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = "";
+
+            if (!inputVal.trim()) {
+                alert("請先輸入地址！");
+                return;
+            }
+
+            const normalizedQuery = normalizeAddress(inputVal);
+            
+            const matches = alarmData.filter(row => {
+                const dbAddress = row['地址(比對補助)'];
+                if (!dbAddress) return false;
+                const normalizedDbAddress = normalizeAddress(dbAddress);
+                return normalizedDbAddress.includes(normalizedQuery);
+            });
+
+            if (matches.length > 0) {
+                let html = `<div class="result-title"><i class="fa-solid fa-magnifying-glass"></i> 搜尋結果</div>`;
+                
+                // 顯示轉換後的查詢條件 (提升回饋感)
+                html += `
+                    <div class="result-card status-alert">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>已為您自動優化搜尋條件為：<b>${normalizedQuery}</b></span>
+                    </div>
+                `;
+                
+                // 若符合多筆資料時提示
+                if (matches.length > 1) {
+                    html += `
+                        <div class="result-card warning">
+                            <i class="fa-solid fa-triangle-exclamation" style="font-size:18px; margin-top:2px;"></i>
+                            <div>
+                                <b>注意：系統找到多筆相似的安裝紀錄！</b><br>
+                                請核對完整的門牌，確認是否包含之號、不同樓層（如2樓）或隔壁戶。
+                            </div>
+                        </div>
+                    `;
+                }
+
+                matches.forEach(row => {
+                    html += `
+                    <div class="result-card">
+                        <div class="address-text">
+                            <i class="fa-solid fa-house-fire"></i>
+                            <span>${row['地址(比對補助)']}</span>
+                        </div>
+                        <div class="badge-container">
+                            <span class="badge badge-year">
+                                <i class="fa-regular fa-calendar"></i> 安裝年度：${row['安裝年度'] || '無資料'}
+                            </span>
+                            <span class="badge badge-method">
+                                <i class="fa-solid fa-hand-holding-hand"></i> 補助方式：${row['補助方式'] || '無資料'}
+                            </span>
+                            <span class="badge badge-location">
+                                <i class="fa-solid fa-map-location-dot"></i> 里別：${row['里別'] || '無資料'}
+                            </span>
+                        </div>
+                    </div>`;
+                });
+                resultsDiv.innerHTML = html;
+            } else {
+                resultsDiv.innerHTML = `
+                    <div class="result-title"><i class="fa-solid fa-magnifying-glass"></i> 搜尋結果</div>
+                    <div class="result-card error">
+                        <h3><i class="fa-solid fa-circle-xmark"></i> 查無安裝紀錄</h3>
+                        <p style="margin: 0; font-size: 15px; color: #555; line-height: 1.5;">
+                            找不到包含「<b style="color:#d32f2f;">${normalizedQuery}</b>」的住警器安裝歷史。<br>
+                            請確認地址輸入是否正確，或該住戶尚未申請過政府補助。
+                        </p>
+                    </div>`;
+            }
+            
+            // 自動滾動到結果區域
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // 支援按 Enter 鍵搜尋
+        document.getElementById("addressInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                document.getElementById("searchBtn").click();
+            }
+        });
+    </script>
+</body>
+</html>
