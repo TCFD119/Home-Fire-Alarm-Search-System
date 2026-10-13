@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔔 中山分隊住警器安裝查詢系統 (中山分隊)</title>
+    <title>🔔 中山分隊住警器安裝查詢系統</title>
     <!-- 引入 Font Awesome 繽紛圖示 與 PapaParse -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -181,11 +181,14 @@
             cursor: not-allowed;
         }
 
-        /* 連結按鈕 (示警成效統計表) */
+        /* 表單連結區域設計為縱向排版 (Flex Column) */
         .form-link-container {
             margin-top: 20px;
-            padding-top: 15px;
+            padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .form-link {
@@ -196,7 +199,7 @@
             background: rgba(255, 255, 255, 0.04);
             color: #90caf9;
             text-decoration: none;
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 600;
             padding: 12px;
             border-radius: 10px;
@@ -211,6 +214,17 @@
             border-color: #90caf9;
             color: #ffffff;
             transform: scale(1.01);
+        }
+        
+        .form-link.doc-link {
+            color: #ffe082;
+            border-color: rgba(255, 224, 130, 0.3);
+        }
+        
+        .form-link.doc-link:hover {
+            background: rgba(255, 224, 130, 0.08);
+            border-color: #ffe082;
+            color: #ffffff;
         }
 
         /* 搜尋結果呈現 */
@@ -369,8 +383,15 @@
                 <i class="fa-solid fa-magnifying-glass"></i> 開始查詢
             </button>
             
-            <!-- 示警成效統計表連結 -->
+            <!-- 填報說明與表單連結 -->
             <div class="form-link-container">
+                <!-- 新增：填報說明連結 -->
+                <a href="https://docs.google.com/document/d/164rfsdZk5aMhA1TNa3nJO1m98N7iJT8Z/edit" target="_blank" class="form-link doc-link">
+                    <i class="fa-solid fa-book-open" style="font-size: 16px;"></i>
+                    <span>住宅火警住警器安裝情況填報說明 ↗</span>
+                </a>
+                
+                <!-- 原有：統計表連結 -->
                 <a href="https://docs.google.com/forms/d/e/1FAIpQLScygm2kEI7JaOvLoMqSjzZESo1ud2wYJyPrMtSueQbiQdslhQ/viewform" target="_blank" class="form-link">
                     <i class="fa-solid fa-file-signature" style="font-size: 16px;"></i>
                     <span>臺中市政府消防局<br>住宅火警住警器示警成效統計表 ↗</span>
@@ -465,7 +486,6 @@
             if (matches.length > 0) {
                 let html = `<div class="result-title"><i class="fa-solid fa-magnifying-glass"></i> 搜尋結果</div>`;
                 
-                // 顯示轉換後的查詢條件 (提升回饋感)
                 html += `
                     <div class="result-card status-alert">
                         <i class="fa-solid fa-sliders"></i>
@@ -473,7 +493,6 @@
                     </div>
                 `;
                 
-                // 若符合多筆資料時提示
                 if (matches.length > 1) {
                     html += `
                         <div class="result-card warning">
@@ -519,7 +538,6 @@
                     </div>`;
             }
             
-            // 自動滾動到結果區域
             resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
